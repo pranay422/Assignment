@@ -7,7 +7,7 @@ const url = process.env.SCRAPE_URL || 'https://example.com';
   const browser = await puppeteer.launch({
     headless: 'new', // Required by Puppeteer 20+
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    executablePath: '/usr/bin/chromium-browser'
+    executablePath: '/usr/bin/chromium'
   });
 
   const page = await browser.newPage();
