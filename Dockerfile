@@ -1,7 +1,7 @@
-# Stage 1: Scraper
+# Stage 1: Node.js Scraper
 FROM node:18-slim as scraper
 
-# Install Chromium and required tools
+# Install Chromium and dependencies
 RUN apt-get update && apt-get install -y \
     chromium \
     fonts-liberation \
@@ -10,25 +10,26 @@ RUN apt-get update && apt-get install -y \
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
+# Set workdir and copy project
 WORKDIR /app
-
 COPY package.json ./
 RUN npm install
-
 COPY scrape.js ./
 
-# Set SCRAPE_URL to example.com by default
+# Accept SCRAPE_URL as build argument
 ARG SCRAPE_URL=https://example.com
 ENV SCRAPE_URL=${SCRAPE_URL}
 
+# Run scraping
 RUN node scrape.js
 
-# Stage 2: Python Flask server
+# Stage 2: Python Flask Server
 FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY --from=scraper /app/scraped_data.json ./scraped_data.json
+# Copy scraped data only
+COPY --from=scraper /app/scraped_data.json ./
 COPY server.py ./
 COPY requirements.txt ./
 
